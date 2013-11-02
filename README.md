@@ -49,6 +49,8 @@ then processed by a "consumer". Let's look at what a simple producer looks
 like.
 
 ```python
+from kombu import Connection
+
 conn = Connection(
     transport="kombu_appengine:Transport",
     transport_options={
@@ -75,6 +77,8 @@ A "consumer" processes tasks from the task queue and removes them once it is
 finished processing.
 
 ```python
+from kombu import Connection
+
 conn = Connection(
     transport="kombu_appengine:Transport",
     transport_options={
@@ -118,6 +122,8 @@ probably check out the documentation for kombu.
 http://ask.github.io/kombu/introduction.html#terminology
 
 ```python
+from kombu import Connection, Exchange, Queue
+
 # Create the exchange and queue. These are used to route messages.
 app_engine = Exchange("appengine", "direct", durable=True)
 pull_queue = Queue("pull-queue", exchange=app_engine, routing_key="pull-queue")
@@ -127,8 +133,7 @@ conn = Connection(
     userid='credentials',
     transport="kombu_appengine:Transport",
     transport_options={
-        'project_name': 'ian-test-hr',
-        'hrd_project': True,
+        'project_name': 'my_project',
         'polling_interval': 5,
         'credentials_file': 'credentials',
     }
