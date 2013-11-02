@@ -30,19 +30,21 @@ A "producer" creates tasks and puts them on the task queue. These tasks are
 then processed by a "consumer". Let's look at what a simple producer looks
 like.
 
-    conn = Connection(
-        transport="kombu_appengine:Transport",
-        transport_options={
-            'project_name': "my_project",
-            'credentials_file': "/path/to/credentials",
-        }
-    )
+```python
+conn = Connection(
+    transport="kombu_appengine:Transport",
+    transport_options={
+        'project_name': "my_project",
+        'credentials_file': "/path/to/credentials",
+    }
+)
 
-    with conn:
-        queue = conn.SimpleQueue('pull-queue')
-        while True:
-            queue.put(json.dumps({'message': message}))
-            time.sleep(1)
+with conn:
+    queue = conn.SimpleQueue('pull-queue')
+    while True:
+        queue.put(json.dumps({'message': message}))
+        time.sleep(1)
+```
 
 Here we use the SimpleQueue class from kombu. SimpleQueue has a very similar
 api to the native Queue class in python. This producer will create a new tasks
@@ -54,26 +56,28 @@ A Simple Consumer
 A "consumer" processes tasks from the task queue and removes them once it is
 finished processing.
 
-    conn = Connection(
-        transport="kombu_appengine:Transport",
-        transport_options={
-            'project_name': 'my_project',
-            'polling_interval': 5,
-            'num_tasks': 15,
-            'credentials_file': 'credentials',
-        }
-    )
+```python
+conn = Connection(
+    transport="kombu_appengine:Transport",
+    transport_options={
+        'project_name': 'my_project',
+        'polling_interval': 5,
+        'num_tasks': 15,
+        'credentials_file': 'credentials',
+    }
+)
 
-    try:
-        with conn:
-            queue = conn.SimpleQueue('pull-queue')
-            while True:
-                msg = queue.get()
-                message = json.loads(msg.body)
-                print message['message']
-                msg.ack()
-    except KeyboardInterrupt:
-        print('Exiting.')
+try:
+    with conn:
+        queue = conn.SimpleQueue('pull-queue')
+        while True:
+            msg = queue.get()
+            message = json.loads(msg.body)
+            print message['message']
+            msg.ack()
+except KeyboardInterrupt:
+    print('Exiting.')
+```
 
 We lease the task using the get() method and process it. In this case we are
 simply printing the text message we received. After we are finished, we
@@ -86,15 +90,21 @@ Suported Transport Options
 The kombu\_appengine transport backend supports several options which can be
 set via the transport\_options parameter to the Connection class.
 
+---------------------------------------------------------------------------------------------------------------------
 | Option            | Required | Default | Description                                                              |
-| ----------------- |:--------:|:-------:|:------------------------------------------------------------------------:|
+---------------------------------------------------------------------------------------------------------------------
 | project\_name     | required | None    | The Google Cloud Console project                                         |
+---------------------------------------------------------------------------------------------------------------------
 | hrd\_project      | optional | True    | A boolean option specifying if the app is an HRD app in App Engine.      |
 |                   |          |         | This is used as a workaround for API issues. See this issue for details: |
 |                   |          |         | https://code.google.com/p/googleappengine/issues/detail?id=10199         |
+---------------------------------------------------------------------------------------------------------------------
 | credentials\_file | required | None    | The path to the credentials file created after authenticating.           |
+---------------------------------------------------------------------------------------------------------------------
 | polling\_interval | optional | 1.0     | The number of seconds between polling calls to the pull queue API.       |
+---------------------------------------------------------------------------------------------------------------------
 | num\_tasks        | optional | 1       | The number of tasks to lease at once and buffer locally for consumption. |
+---------------------------------------------------------------------------------------------------------------------
 
 A Note About Celery
 =======================
