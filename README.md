@@ -7,6 +7,24 @@ consumers for tasks from the appengine pull queue API.
 You can find out more about the pull task queue REST API here:
 https://developers.google.com/appengine/docs/python/taskqueue/rest/
 
+Why Use It
+=======================
+
+Why use the pull task queue API?
+
+There are some instances where you would like to use the pull queue API to
+perform tasks that are difficult or impossible to do on App Engine. Things
+like complicated processing of images or video, using libraries or software
+not available on App Engine, or long running CPU bound tasks.
+
+Why use kombu?
+
+kombu provides a pretty simple API for dealing with queues so it gives you
+a good starting point for creating a consumer that can process tasks. Kombu
+handles polling, routing, and management of tasks. And in the unlikely event
+you want to use some other queue system you can reuse your existing code by
+changing just a few options.
+
 Setup
 =======================
 
@@ -83,6 +101,60 @@ We lease the task using the get() method and process it. In this case we are
 simply printing the text message we received. After we are finished, we
 "acknowledge" we are finished by calling the ack() method on the returned
 message object. This deletes the task from the App Engine pull queue.
+
+More Advanced Producers and Consumers
+===========================================
+
+More advanced routing can be done using kombu's Producer and Consumer class.
+Unless you are utilizing multiple pull queues and doing some complicated
+routing, you likely wouldn't need to do use these.
+
+If you are queueing tasks from an App Engine application, then you will likely
+be using the App Engine SDK to queue your tasks anyway.
+
+If you think you might need to do something complicated like use multiple
+queues with tasks processed by a single or multiple consumer then you should
+probably check out the documentation for kombu.
+http://ask.github.io/kombu/introduction.html#terminology
+
+```python
+# Create the exchange and queue. These are used to route messages.
+app_engine = Exchange("appengine", "direct", durable=True)
+pull_queue = Queue("pull-queue", exchange=app_engine, routing_key="pull-queue")
+
+conn = Connection(
+    hostname='',
+    userid='credentials',
+    transport="kombu_appengine:Transport",
+    transport_options={
+        'project_name': 'ian-test-hr',
+        'hrd_project': True,
+        'polling_interval': 5,
+        'credentials_file': 'credentials',
+    }
+)
+
+# Enqueue a task
+text = "Hello World!"
+
+with conn:
+    # Declare the queue.
+    pull_queue(conn.channel()).declare()
+
+    with conn.Producer(exchange=app_engine, routing_key="pull-queue") as producer:
+        producer.publish({'text': text})
+
+
+    def process_msg(body, message):
+        print body['text']
+        # Acknowledge the message so the task is deleted
+        message.ack()
+
+    with conn.Consumer(video_queue, callbacks=[process_media]) as consumer:
+        # Process messages and handle events on all channels
+        while True:
+            conn.drain_events()
+```
 
 Suported Transport Options
 =============================
