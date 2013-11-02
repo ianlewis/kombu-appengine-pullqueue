@@ -105,7 +105,7 @@ message object. This deletes the task from the App Engine pull queue.
 More Advanced Producers and Consumers
 ===========================================
 
-More advanced routing can be done using kombu's Producer and Consumer class.
+More advanced routing can be done using kombu's Producer and Consumer classes.
 Unless you are utilizing multiple pull queues and doing some complicated
 routing, you likely wouldn't need to do use these.
 
@@ -156,7 +156,7 @@ with conn:
             conn.drain_events()
 ```
 
-Suported Transport Options
+Supported Transport Options
 =============================
 
 The kombu\_appengine transport backend supports several options which can be
