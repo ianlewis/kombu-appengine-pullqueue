@@ -90,21 +90,13 @@ Suported Transport Options
 The kombu\_appengine transport backend supports several options which can be
 set via the transport\_options parameter to the Connection class.
 
----------------------------------------------------------------------------------------------------------------------
 | Option            | Required | Default | Description                                                              |
----------------------------------------------------------------------------------------------------------------------
+| ----------------- |:--------:|:-------:|:------------------------------------------------------------------------:|
 | project\_name     | required | None    | The Google Cloud Console project                                         |
----------------------------------------------------------------------------------------------------------------------
-| hrd\_project      | optional | True    | A boolean option specifying if the app is an HRD app in App Engine.      |
-|                   |          |         | This is used as a workaround for API issues. See this issue for details: |
-|                   |          |         | https://code.google.com/p/googleappengine/issues/detail?id=10199         |
----------------------------------------------------------------------------------------------------------------------
+| hrd\_project      | optional | True    | A boolean option specifying if the app is an HRD app in App Engine. This is used as a workaround for API issues. See this issue for details: https://code.google.com/p/googleappengine/issues/detail?id=10199 |
 | credentials\_file | required | None    | The path to the credentials file created after authenticating.           |
----------------------------------------------------------------------------------------------------------------------
 | polling\_interval | optional | 1.0     | The number of seconds between polling calls to the pull queue API.       |
----------------------------------------------------------------------------------------------------------------------
 | num\_tasks        | optional | 1       | The number of tasks to lease at once and buffer locally for consumption. |
----------------------------------------------------------------------------------------------------------------------
 
 A Note About Celery
 =======================
