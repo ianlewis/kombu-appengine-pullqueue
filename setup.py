@@ -19,7 +19,13 @@ setup (
     ],
     packages=find_packages(),
     install_requires=[
+        'argparse>=1.2,<1.3',
         'kombu>=2.5,<2.6',
         'google-api-python-client>=1.2,<1.3',
     ],
+    entry_points={
+        'console_scripts': [
+            "pullqueue_authenticate = kombu_appengine:authenticate_main",
+        ],
+    }
 )

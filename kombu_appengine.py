@@ -164,7 +164,7 @@ class Channel(virtual.Channel):
                 # A bag of bytes which is the task payload. The payload on 
                 # the JSON side is always Base64 encoded.
                 "payloadBase64": base64.b64encode(json.dumps(message)),
-            } 
+            }
         ).execute()
 
         logger.info('Inserted Task: %r', task)
@@ -284,3 +284,37 @@ class Transport(virtual.Transport):
     channel_errors = (HttpError, StdChannelError)
     driver_type = 'appengine_taskqueue'
     driver_name = 'appengine_taskqueue'
+
+
+def authenticate_main():
+    """
+    Authenticate using OAuth with the Task Queue API.
+    """
+    import sys
+
+    import argparse
+    from oauth2client import tools
+    from oauth2client.client import flow_from_clientsecrets
+
+    if len(sys.argv) > 1 and sys.argv[0] == 'python':
+        argv = sys.argv[2:]
+    else:
+        argv = sys.argv[1:]
+
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        parents=[tools.argparser])
+
+    parser.add_argument('client_secrets', metavar='SECRETS',
+                   help='Path to the client_secrets.json.')
+    parser.add_argument('credentials', metavar='CREDENTIALS',
+                   help='Path where the credentials will be stored.')
+
+    flags = parser.parse_args(argv)
+
+    tools.run_flow(
+        flow_from_clientsecrets(flags.client_secrets, scope="https://www.googleapis.com/auth/taskqueue"),
+        storage=Storage(flags.credentials),
+        flags=flags,
+    )
+    print('Saved credentials to %s' % flags.credentials)

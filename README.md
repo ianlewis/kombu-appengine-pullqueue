@@ -36,10 +36,11 @@ you register your application be sure to create a "Native" application.
 
 https://developers.google.com/appengine/docs/python/taskqueue/rest/about\_auth
 
-Once you have done that you can authenticate very simply using the provided
-authentication utility.
+Once you have done that you can download the client\_secrets.json file from the
+cloud console. Once you have the client\_secrets.json, you can authenticate
+very simply using the provided authentication utility.
 
-TODO: Not yet done
+    $ pullqueue_authenticate client_secrets.json credentials
 
 A Simple Producer 
 =======================
